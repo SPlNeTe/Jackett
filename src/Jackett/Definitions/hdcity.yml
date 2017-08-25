@@ -1,0 +1,136 @@
+﻿---
+  site: hdcity
+  name:  HDCity
+  description: "HDCity is a private torrent website with HD torrents and strict rules on their content"
+  language: es-es
+  encoding: UTF-8
+  type: private
+  links:
+    - https://hdcity.li/
+
+  caps:
+    categorymappings:
+      - {id: 1, cat: Movies/HD, desc: "Movie"}
+      - {id: 2, cat: TV/HD, desc: "TV Show"}
+      - {id: 3, cat: TV/Anime, desc: "Anime"}
+      - {id: 7, cat: XXX/x264, desc: "XXX"}
+      - {id: 9, cat: Movies/HD, desc: "Animation"}
+      - {id: 10, cat: Movies/HD, desc: "Animation"}
+      - {id: 12, cat: Movies/BluRay, desc: "Movie/Blu-Ray"}
+      - {id: 13, cat: Movies/HD, desc: "Blu-ray 1080 rip"}
+      - {id: 14, cat: Movies/HD, desc: "Movie/720p rip"}
+      - {id: 15, cat: Movies/WEBDL, desc: "Movie/1080 HDTV & WEB-DL"}
+      - {id: 16, cat: Movies/WEBDL, desc: "Movie/720 HDTV & WEB-DL"}
+      - {id: 17, cat: Movies/HD, desc: "Movies/Blu-ray Remux"}
+      - {id: 22, cat: TV/HD, desc: "TV Show/Blu-ray 1080 rip"}
+      - {id: 23, cat: TV/HD, desc: "TV Show/Blu-ray 720 rip"}
+      - {id: 24, cat: TV/WEB-DL, desc: "TV Show/1080 HDTV & WEB-DL"}
+      - {id: 25, cat: TV/WEB-DL, desc: "TV Show/720 HDTV & WEB-DL"}
+      - {id: 28, cat: TV/Anime, desc: "Anime/Blu-ray 1080 rip"}
+      - {id: 29, cat: TV/Anime, desc: "Anime/Blu-ray 720 rip"}
+      - {id: 30, cat: Movies/HD, desc: "Animation/Blu-ray 1080"}
+      - {id: 31, cat: Movies/HD, desc: "Animation/Blu-ray 720"}
+      - {id: 32, cat: TV/Anime, desc: "Anime/Blu-ray Remux"}
+      - {id: 33, cat: Movies/WEBDL, desc: "Animation/WEB-DL 1080"}
+      - {id: 35, cat: Movies/WEBDL, desc: "Animation/WEB-DL 720"}
+      - {id: 41, cat: Movies/HD, desc: "Animation/Blu-ray 1080"}
+      - {id: 42, cat: Movies/HD, desc: "Animation/Blu-ray 720"}
+      - {id: 43, cat: Movies/WEBDL, desc: "Animation/WEB-DL 1080"}
+      - {id: 44, cat: Movies/WEBDL, desc: "Animation/WEB-DL 720"}
+      - {id: 49, cat: XXX/x264, desc: "XXX/Blu-ray 1080 rip"}
+      - {id: 52, cat: XXX/x264, desc: "XXX/Blu-ray 720 rip"}
+      - {id: 56, cat: XXX/x264, desc: "XXX/HDTV 1080"}
+      - {id: 60, cat: XXX/x264, desc: "XXX/HDTV 720"}
+      - {id: 63, cat: Movies/BluRay, desc: "Animation/Blu-Ray Remux"}
+      - {id: 72, cat: Movies/BluRay, desc: "Movies/Blu-ray 4K Remux"}
+      - {id: 73, cat: Movies/BluRay, desc: "Movies/Blu-ray 4K Rip"}
+      - {id: 76, cat: TV/HD, desc: "TV Show/4K BDRemux"}
+      - {id: 77, cat: TV/HD, desc: "TV Show/4K Blu-ray Ri"}
+      - {id: 81, cat: Movies/BluRay, desc: "Animation/Blu-Ray 4K Remux"}
+      - {id: 82, cat: Movies/HD, desc: "Animation/Blu-Ray 4K Rip"}
+      - {id: 85, cat: Movies/BluRay, desc: "Animation/Blu-Ray 4K Remux"}
+      - {id: 86, cat: Movies/HD, desc: "Animation/Blu-Ray 4K Rip"}
+      - {id: 105, cat: XXX/DVD, desc: "XXX/4K Blu-Ray Remux "}
+      - {id: 106, cat: XXX/x264, desc: "XXX/4K Blu-Ray Rip"}
+      - {id: 107, cat: TV/Anime, desc: "Anime/HDTV 4K"}
+      - {id: 108, cat: Movies/HD, desc: "Animation/4K HDTV WEB-DL"}
+      - {id: 109, cat: Movies/HD, desc: "Animation/4K HDTV WEB-DL"}
+      - {id: 110, cat: Movies/HD, desc: "Movies/4K HDTV & WEB-DL "}
+      - {id: 111, cat: TV/HD, desc: "TV Show/4K WEB-DL"}
+      - {id: 115, cat: XXX/x264, desc: "XXX/4K HDTV & WEB-DL"}
+    modes:
+      search: [q]
+      tv-search: [q, season, ep]
+
+  login:
+    path: index.php?page=login
+    method: post
+    inputs:
+      username: "{{ .Config.username }}"
+      password: "{{ .Config.password }}"
+    error:
+      - selector: table.lista > tbody > tr > td.lista > span[style="color:#FF0000;"]
+    test:
+      path: index.php
+
+  ratio:
+    path: index.php
+    selector: "ul#navlist > li:contains(\"SR: \")"
+    filters:
+      - name: split
+        args: ["\u00a0", 1]
+      - name: replace
+    args: ["---", "0"]
+     
+  search:
+    path: index.php
+    inputs:
+      search: "{{ .Query.Keywords }}"
+      page: torrents
+      options: 0
+      active: 0
+    rows:
+      selector: div.b-content > table.lista > tbody > tr:has(a[href^="index.php?page=torrents&category="])
+    fields:
+      download:
+        selector: a[href^="download.php?id="]
+        attribute: href
+      title:
+        selector: a[href^="index.php?page=torrent-details&id="]
+        attribute: title
+      category:
+        selector: a[href^="index.php?page=torrents&category="]
+        attribute: href
+        filters:
+          - name: querystring
+            args: category
+      comments:
+        selector: a[href^="index.php?page=torrent-details&id="]
+        attribute: href
+      banner: # link to a banner image (cover, etc.)
+        optional: true # don't fail if the selector doesn't match
+        selector: a[href^="index.php?page=torrent-details&id="]
+        attribute: onmouseover
+        filters:
+          - name: regexp
+            args: src=\\'(.+?)\\'
+          - name: replace # replace dummy image with empty string
+            args: ["torrentimg/nocover.jpg", ""]
+      size:
+        selector: td:nth-last-child(3)
+      date:
+        selector: td:nth-last-child(8)
+      grabs:
+        selector: td:nth-last-child(7)
+      seeders:
+        selector: a[title="Click aqui para ver los detalles de los peers"]:nth-child(1)
+      leechers:
+        selector: a[title="Click aqui para ver los detalles de los peers"]:nth-child(2)
+      downloadvolumefactor:
+        case:
+          img[alt="Gold 100% Free"]: "0"
+          "*": "1"
+      uploadvolumefactor:
+        case:
+          img[alt="2x Upload Multiplier"]: "2"
+          "*": "1"
